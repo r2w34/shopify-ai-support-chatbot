@@ -1,18 +1,16 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// AI Support Chatbot Prisma Schema
+// Comprehensive data models for AI chat, orders, products, analytics, and subscriptions
 
 generator client {
   provider = "prisma-client-js"
 }
 
-// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
-// enough when changing adapters.
-// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
   provider = "sqlite"
   url      = "file:dev.sqlite"
 }
 
+// Shopify Session Management
 model Session {
   id            String    @id
   shop          String
@@ -29,4 +27,229 @@ model Session {
   locale        String?
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
+}
+
+// Store Configuration and Settings
+model Store {
+  id                  String   @id @default(cuid())
+  shopDomain          String   @unique
+  shopName            String?
+  email               String?
+  currency            String   @default("USD")
+  timezone            String?
+  locale              String   @default("en")
+  plan                String   @default("free")
+  trialEndsAt         DateTime?
+  subscriptionStatus  String   @default("inactive")
+  installedAt         DateTime @default(now())
+  uninstalledAt       DateTime?
+  isActive            Boolean  @default(true)
+  chatSessions        ChatSession[]
+  chatSettings        ChatSettings?
+  subscriptions       Subscription[]
+  analytics           Analytics[]
+  automations         Automation[]
+  faqs                FAQ[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+// Chat Settings and Customization
+model ChatSettings {
+  id                    String   @id @default(cuid())
+  storeId               String   @unique
+  store                 Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  enabled               Boolean  @default(true)
+  widgetPosition        String   @default("bottom-right")
+  primaryColor          String   @default("#5C6AC4")
+  accentColor           String   @default("#00848E")
+  welcomeMessage        String   @default("Hi! How can I help you today?")
+  offlineMessage        String   @default("We're currently offline. Leave a message!")
+  businessHours         String?
+  autoReplyEnabled      Boolean  @default(true)
+  orderTrackingEnabled  Boolean  @default(true)
+  productRecsEnabled    Boolean  @default(true)
+  languages             String   @default("en")
+  aiModel               String   @default("gpt-4")
+  aiTemperature         Float    @default(0.7)
+  maxTokens             Int      @default(500)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// Chat Sessions
+model ChatSession {
+  id                String   @id @default(cuid())
+  storeId           String
+  store             Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId        String?
+  customerEmail     String?
+  customerName      String?
+  sessionToken      String   @unique
+  startedAt         DateTime @default(now())
+  endedAt           DateTime?
+  status            String   @default("active")
+  channel           String   @default("widget")
+  language          String   @default("en")
+  sentiment         String?
+  satisfactionScore Int?
+  messages          ChatMessage[]
+  metadata          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([storeId, customerId])
+  @@index([sessionToken])
+}
+
+// Chat Messages
+model ChatMessage {
+  id            String      @id @default(cuid())
+  sessionId     String
+  session       ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender        String
+  message       String
+  messageType   String      @default("text")
+  isAI          Boolean     @default(false)
+  intent        String?
+  entities      String?
+  confidence    Float?
+  attachments   String?
+  metadata      String?
+  sentAt        DateTime    @default(now())
+
+  @@index([sessionId])
+}
+
+// FAQ Management
+model FAQ {
+  id            String   @id @default(cuid())
+  storeId       String
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  question      String
+  answer        String
+  category      String?
+  language      String   @default("en")
+  priority      Int      @default(0)
+  enabled       Boolean  @default(true)
+  useCount      Int      @default(0)
+  lastUsed      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([storeId, language])
+}
+
+// Product Recommendations
+model ProductRecommendation {
+  id            String   @id @default(cuid())
+  shopifyId     String
+  customerId    String?
+  productIds    String
+  algorithm     String   @default("collaborative")
+  confidence    Float
+  context       String?
+  clicked       Boolean  @default(false)
+  converted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([customerId])
+}
+
+// Automation Rules
+model Automation {
+  id            String   @id @default(cuid())
+  storeId       String
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name          String
+  type          String
+  trigger       String
+  conditions    String
+  actions       String
+  enabled       Boolean  @default(true)
+  executionCount Int     @default(0)
+  lastExecuted  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([storeId, type])
+}
+
+// Subscription Management (Shopify Billing)
+model Subscription {
+  id                  String   @id @default(cuid())
+  storeId             String
+  store               Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  shopifyChargeId     String?  @unique
+  plan                String
+  status              String
+  price               Float
+  currency            String
+  billingInterval     String
+  trialDays           Int      @default(0)
+  currentPeriodStart  DateTime
+  currentPeriodEnd    DateTime
+  cancelledAt         DateTime?
+  metadata            String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+// Analytics and Metrics
+model Analytics {
+  id                  String   @id @default(cuid())
+  storeId             String
+  store               Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  date                DateTime
+  totalChats          Int      @default(0)
+  activeUsers         Int      @default(0)
+  messagesExchanged   Int      @default(0)
+  avgResponseTime     Float?
+  avgSatisfaction     Float?
+  conversionsFromChat Int      @default(0)
+  revenueFromChat     Float    @default(0)
+  topIntents          String?
+  topProducts         String?
+  metadata            String?
+  createdAt           DateTime @default(now())
+
+  @@unique([storeId, date])
+  @@index([storeId, date])
+}
+
+// Order Tracking Cache
+model OrderTracking {
+  id              String   @id @default(cuid())
+  shopifyOrderId  String   @unique
+  orderNumber     String
+  customerId      String?
+  customerEmail   String
+  status          String
+  fulfillmentStatus String?
+  trackingNumber  String?
+  trackingUrl     String?
+  carrier         String?
+  estimatedDelivery DateTime?
+  lastUpdated     DateTime @default(now())
+  metadata        String?
+
+  @@index([customerEmail])
+  @@index([orderNumber])
+}
+
+// Customer Preferences
+model CustomerPreference {
+  id              String   @id @default(cuid())
+  customerId      String   @unique
+  preferredLanguage String @default("en")
+  timezone        String?
+  notifications   Boolean  @default(true)
+  emailOptIn      Boolean  @default(false)
+  smsOptIn        Boolean  @default(false)
+  whatsappOptIn   Boolean  @default(false)
+  metadata        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

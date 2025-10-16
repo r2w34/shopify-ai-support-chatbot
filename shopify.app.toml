@@ -1,38 +1,110 @@
-# This file stores configurations for your Shopify app.
+# This file stores configurations for your AI Support Chatbot Shopify app.
+# App Name: AI Support Chatbot
+# Description: AI-powered chat support with product recommendations, order tracking, and automation
 
-scopes = "write_products"
+name = "AI Support Chatbot"
+handle = "ai-support-chatbot"
+client_id = ""
+application_url = ""
+
+# All required scopes for comprehensive AI support functionality
+scopes = "read_products,write_products,read_orders,write_orders,read_customers,write_customers,read_content,write_content,read_themes,write_themes,read_script_tags,write_script_tags,read_checkouts,write_checkouts,read_marketing_events,write_marketing_events,read_analytics,read_translations,write_translations,read_locales,read_shipping,write_shipping,read_inventory,write_inventory,read_merchant_managed_fulfillment_orders,write_merchant_managed_fulfillment_orders,read_online_store_pages,write_online_store_pages,read_price_rules,write_price_rules,read_discounts,write_discounts"
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = ""
+
+[access_scopes]
+# Use the TOML configuration file to access scopes for embedded apps
+
+[auth]
+redirect_urls = [
+  "/auth/callback", 
+  "/auth/shopify/callback",
+  "/api/auth/callback"
+]
 
 [webhooks]
 api_version = "2024-10"
 
-  # Handled by: /app/routes/webhooks.app.uninstalled.tsx
+  # App lifecycle webhooks
   [[webhooks.subscriptions]]
   uri = "/webhooks/app/uninstalled"
   topics = ["app/uninstalled"]
 
-  # Handled by: /app/routes/webhooks.app.scopes_update.tsx
   [[webhooks.subscriptions]]
   topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
 
-  # Webhooks can have filters
-  # Only receive webhooks for product updates with a product price >= 10.00
-  # See: https://shopify.dev/docs/apps/build/webhooks/customize/filters
-  # [[webhooks.subscriptions]]
-  # topics = ["products/update"]
-  # uri = "/webhooks/products/update"
-  # filter = "variants.price:>=10.00"
+  # Product webhooks for real-time catalog updates
+  [[webhooks.subscriptions]]
+  topics = ["products/create"]
+  uri = "/webhooks/products/create"
 
-  # Mandatory compliance topic for public apps only
-  # See: https://shopify.dev/docs/apps/build/privacy-law-compliance
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/customers/data_request"
-  # compliance_topics = ["customers/data_request"]
+  [[webhooks.subscriptions]]
+  topics = ["products/update"]
+  uri = "/webhooks/products/update"
 
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/customers/redact"
-  # compliance_topics = ["customers/redact"]
+  [[webhooks.subscriptions]]
+  topics = ["products/delete"]
+  uri = "/webhooks/products/delete"
 
-  # [[webhooks.subscriptions]]
-  # uri = "/webhooks/shop/redact"
-  # compliance_topics = ["shop/redact"]
+  # Order webhooks for order tracking and automation
+  [[webhooks.subscriptions]]
+  topics = ["orders/create"]
+  uri = "/webhooks/orders/create"
+
+  [[webhooks.subscriptions]]
+  topics = ["orders/updated"]
+  uri = "/webhooks/orders/updated"
+
+  [[webhooks.subscriptions]]
+  topics = ["orders/fulfilled"]
+  uri = "/webhooks/orders/fulfilled"
+
+  [[webhooks.subscriptions]]
+  topics = ["orders/cancelled"]
+  uri = "/webhooks/orders/cancelled"
+
+  # Cart webhooks for abandonment tracking
+  [[webhooks.subscriptions]]
+  topics = ["carts/create"]
+  uri = "/webhooks/carts/create"
+
+  [[webhooks.subscriptions]]
+  topics = ["carts/update"]
+  uri = "/webhooks/carts/update"
+
+  # Customer webhooks for personalization
+  [[webhooks.subscriptions]]
+  topics = ["customers/create"]
+  uri = "/webhooks/customers/create"
+
+  [[webhooks.subscriptions]]
+  topics = ["customers/update"]
+  uri = "/webhooks/customers/update"
+
+  # Checkout webhooks for conversion optimization
+  [[webhooks.subscriptions]]
+  topics = ["checkouts/create"]
+  uri = "/webhooks/checkouts/create"
+
+  [[webhooks.subscriptions]]
+  topics = ["checkouts/update"]
+  uri = "/webhooks/checkouts/update"
+
+  # Mandatory GDPR/CCPA compliance webhooks (required for public apps)
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/customers/data_request"
+  compliance_topics = ["customers/data_request"]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/customers/redact"
+  compliance_topics = ["customers/redact"]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/shop/redact"
+  compliance_topics = ["shop/redact"]
+
+[pos]
+embedded = false
