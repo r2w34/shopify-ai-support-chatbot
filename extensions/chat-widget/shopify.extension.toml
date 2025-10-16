@@ -1,0 +1,70 @@
+# AI Chat Widget - Theme Extension Configuration
+# This extension adds an AI-powered chat widget to the storefront
+
+api_version = "2024-10"
+type = "theme"
+name = "AI Chat Widget"
+
+[settings]
+
+  [[settings.blocks]]
+  type = "app"
+  name = "Chat Widget"
+
+  [[settings.settings]]
+  type = "checkbox"
+  id = "enabled"
+  label = "Enable chat widget"
+  default = true
+  info = "Show/hide the chat widget on your storefront"
+
+  [[settings.settings]]
+  type = "select"
+  id = "position"
+  label = "Widget position"
+  default = "bottom-right"
+  options = [
+    { value = "bottom-right", label = "Bottom Right" },
+    { value = "bottom-left", label = "Bottom Left" },
+    { value = "top-right", label = "Top Right" },
+    { value = "top-left", label = "Top Left" }
+  ]
+
+  [[settings.settings]]
+  type = "color"
+  id = "primary_color"
+  label = "Primary color"
+  default = "#5C6AC4"
+  info = "Main color for the chat widget"
+
+  [[settings.settings]]
+  type = "color"
+  id = "accent_color"
+  label = "Accent color"
+  default = "#00848E"
+  info = "Accent color for buttons and highlights"
+
+  [[settings.settings]]
+  type = "text"
+  id = "welcome_message"
+  label = "Welcome message"
+  default = "Hi! How can I help you today?"
+  info = "First message customers see"
+
+  [[settings.settings]]
+  type = "checkbox"
+  id = "show_product_recs"
+  label = "Show product recommendations"
+  default = true
+
+  [[settings.settings]]
+  type = "checkbox"
+  id = "show_order_tracking"
+  label = "Show order tracking"
+  default = true
+
+  [[settings.settings]]
+  type = "checkbox"
+  id = "enable_sound"
+  label = "Enable sound notifications"
+  default = false

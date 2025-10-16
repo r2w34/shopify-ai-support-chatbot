@@ -1,0 +1,21 @@
+{
+  "chat": {
+    "button_label": "Ouvrir le chat",
+    "minimize": "Réduire le chat",
+    "online": "En ligne maintenant",
+    "offline": "Actuellement hors ligne",
+    "input_placeholder": "Tapez votre message...",
+    "input_label": "Saisie du message",
+    "send": "Envoyer le message",
+    "recommended_products": "Recommandé pour vous",
+    "order_tracking": "Suivre votre commande",
+    "track_order": "Suivre la Commande",
+    "browse_products": "Parcourir les Produits",
+    "get_help": "Obtenir de l'Aide",
+    "welcome_default": "Bonjour! Comment puis-je vous aider aujourd'hui?",
+    "error_connection": "Erreur de connexion. Veuillez réessayer.",
+    "error_generic": "Quelque chose s'est mal passé. Veuillez réessayer.",
+    "typing": "En train d'écrire...",
+    "powered_by": "Propulsé par AI Support"
+  }
+}

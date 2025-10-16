@@ -1,0 +1,197 @@
+{% comment %}
+  AI Chat Widget - Main Block
+  Renders the chat widget on the storefront
+{% endcomment %}
+
+{% if block.settings.enabled %}
+<div 
+  id="ai-chat-widget" 
+  class="ai-chat-widget"
+  data-position="{{ block.settings.position }}"
+  data-primary-color="{{ block.settings.primary_color }}"
+  data-accent-color="{{ block.settings.accent_color }}"
+  data-welcome-message="{{ block.settings.welcome_message }}"
+  data-show-product-recs="{{ block.settings.show_product_recs }}"
+  data-show-order-tracking="{{ block.settings.show_order_tracking }}"
+  data-enable-sound="{{ block.settings.enable_sound }}"
+  data-shop="{{ shop.permanent_domain }}"
+  data-customer-email="{% if customer %}{{ customer.email }}{% endif %}"
+  data-customer-name="{% if customer %}{{ customer.name }}{% endif %}"
+>
+  <!-- Chat Button -->
+  <button 
+    id="ai-chat-button" 
+    class="ai-chat-button"
+    aria-label="{{ 'chat.button_label' | t }}"
+    aria-expanded="false"
+  >
+    <svg class="ai-chat-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/>
+    </svg>
+    <svg class="ai-chat-close" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/>
+    </svg>
+    <span id="ai-chat-badge" class="ai-chat-badge" style="display: none;">0</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div id="ai-chat-window" class="ai-chat-window" style="display: none;">
+    <!-- Header -->
+    <div class="ai-chat-header">
+      <div class="ai-chat-header-content">
+        <div class="ai-chat-avatar">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="16" fill="#ffffff" opacity="0.2"/>
+            <path d="M16 8c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 14c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z" fill="#ffffff"/>
+          </svg>
+        </div>
+        <div class="ai-chat-header-text">
+          <h3>{{ shop.name }}</h3>
+          <p class="ai-chat-status">
+            <span class="ai-chat-status-dot"></span>
+            {{ 'chat.online' | t }}
+          </p>
+        </div>
+      </div>
+      <button class="ai-chat-minimize" aria-label="{{ 'chat.minimize' | t }}">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M4 10h12v2H4z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Messages Container -->
+    <div id="ai-chat-messages" class="ai-chat-messages">
+      <!-- Welcome message will be inserted here -->
+    </div>
+
+    <!-- Product Recommendations (Hidden by default) -->
+    <div id="ai-chat-recommendations" class="ai-chat-recommendations" style="display: none;">
+      <h4>{{ 'chat.recommended_products' | t }}</h4>
+      <div id="ai-chat-recommendations-list" class="ai-chat-recommendations-list"></div>
+    </div>
+
+    <!-- Order Tracking (Hidden by default) -->
+    <div id="ai-chat-order-tracking" class="ai-chat-order-tracking" style="display: none;">
+      <h4>{{ 'chat.order_tracking' | t }}</h4>
+      <div id="ai-chat-order-details" class="ai-chat-order-details"></div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="ai-chat-quick-actions">
+      <button class="ai-chat-quick-action" data-action="track-order">
+        📦 {{ 'chat.track_order' | t }}
+      </button>
+      <button class="ai-chat-quick-action" data-action="browse-products">
+        🛍️ {{ 'chat.browse_products' | t }}
+      </button>
+      <button class="ai-chat-quick-action" data-action="get-help">
+        ❓ {{ 'chat.get_help' | t }}
+      </button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="ai-chat-input-container">
+      <div class="ai-chat-typing-indicator" style="display: none;">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <form id="ai-chat-form" class="ai-chat-form">
+        <input
+          type="text"
+          id="ai-chat-input"
+          class="ai-chat-input"
+          placeholder="{{ 'chat.input_placeholder' | t }}"
+          autocomplete="off"
+          aria-label="{{ 'chat.input_label' | t }}"
+        />
+        <button 
+          type="submit" 
+          class="ai-chat-send"
+          aria-label="{{ 'chat.send' | t }}"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 10l18-8-8 18-2-8-8-2z"/>
+          </svg>
+        </button>
+      </form>
+      <div class="ai-chat-powered-by">
+        Powered by AI Support
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include CSS -->
+{{ 'chat-widget.css' | asset_url | stylesheet_tag }}
+
+<!-- Include JavaScript -->
+<script src="{{ 'chat-widget.js' | asset_url }}" defer></script>
+
+<!-- Socket.IO Client (CDN) -->
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js" crossorigin="anonymous"></script>
+
+{% schema %}
+{
+  "name": "AI Chat Widget",
+  "target": "body",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable chat widget",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "options": [
+        {"value": "bottom-right", "label": "Bottom Right"},
+        {"value": "bottom-left", "label": "Bottom Left"},
+        {"value": "top-right", "label": "Top Right"},
+        {"value": "top-left", "label": "Top Left"}
+      ],
+      "default": "bottom-right"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary color",
+      "default": "#5C6AC4"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#00848E"
+    },
+    {
+      "type": "text",
+      "id": "welcome_message",
+      "label": "Welcome message",
+      "default": "Hi! How can I help you today?"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_recs",
+      "label": "Show product recommendations",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_order_tracking",
+      "label": "Show order tracking",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sound",
+      "label": "Enable sound notifications",
+      "default": false
+    }
+  ]
+}
+{% endschema %}
+{% endif %}

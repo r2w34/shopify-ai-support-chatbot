@@ -1,0 +1,21 @@
+{
+  "chat": {
+    "button_label": "Open chat",
+    "minimize": "Minimize chat",
+    "online": "Online now",
+    "offline": "Currently offline",
+    "input_placeholder": "Type your message...",
+    "input_label": "Message input",
+    "send": "Send message",
+    "recommended_products": "Recommended for you",
+    "order_tracking": "Track Your Order",
+    "track_order": "Track Order",
+    "browse_products": "Browse Products",
+    "get_help": "Get Help",
+    "welcome_default": "Hi! How can I help you today?",
+    "error_connection": "Connection error. Please try again.",
+    "error_generic": "Something went wrong. Please try again.",
+    "typing": "Typing...",
+    "powered_by": "Powered by AI Support"
+  }
+}
