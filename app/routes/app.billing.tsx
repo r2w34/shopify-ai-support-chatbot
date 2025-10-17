@@ -275,7 +275,7 @@ export default function Billing() {
                             <InlineStack align="space-between">
                               <Text as="h3" variant="headingMd">{plan.name}</Text>
                               {plan.isCurrent && <Badge tone="success">Current</Badge>}
-                            </Text>
+                            </InlineStack>
 
                             <Text as="p" variant="heading2xl">
                               {formatCurrency(plan.price)}
